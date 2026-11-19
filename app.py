@@ -15,6 +15,7 @@ from flask import Flask, abort, flash, g, jsonify, redirect, render_template, re
 from conciliacao import historico
 from conciliacao.leitura import ArquivoInvalido, ler_extrato, ler_titulos
 from conciliacao.motor import conciliar
+from conciliacao.regua import ETAPAS, montar_regua
 from conciliacao.relatorio import ROTULO_RESUMO, gerar_excel
 
 PASTA = Path(__file__).parent
@@ -69,6 +70,7 @@ def criar_app(caminho_banco: str | None = None) -> Flask:
             return redirect(url_for("inicio"))
 
         resultado = conciliar(extrato, titulos, hoje)
+        resultado.resumo["data_referencia"] = hoje.isoformat()  # a régua de cobrança usa esta data
         execucao_id = historico.salvar(con(), resultado, nome_extrato, nome_titulos)
         return redirect(url_for("ver_execucao", execucao_id=execucao_id))
 
@@ -99,6 +101,17 @@ def criar_app(caminho_banco: str | None = None) -> Flask:
             as_attachment=True,
             download_name=f"conciliacao_{execucao_id}.xlsx",
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
+    @app.get("/execucoes/<int:execucao_id>/regua")
+    def ver_regua(execucao_id: int):
+        achado = historico.carregar(con(), execucao_id)
+        if achado is None:
+            abort(404)
+        execucao, resultado = achado
+        hoje = date.fromisoformat(resultado.resumo.get("data_referencia") or date.today().isoformat())
+        return render_template(
+            "regua.html", execucao=execucao, hoje=hoje, etapas=ETAPAS, acoes=montar_regua(resultado.em_aberto, hoje)
         )
 
     @app.get("/historico")

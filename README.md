@@ -30,9 +30,24 @@ Cada linha conciliada mostra o **porquê** ("cita o nº do título; valor exato"
 - **Painel** com valor conciliado, % do recebido, diferenças de valor, créditos não identificados e títulos em atraso.
 - **Abas** para conciliados, com diferença, não identificados e títulos em aberto (em atraso ou a vencer).
 - **Relatório em Excel** com quatro abas, cabeçalhos formatados, moeda e datas no padrão brasileiro.
+- **Régua de cobrança** para os títulos em aberto (detalhes abaixo).
 - **Histórico** de todas as conciliações em SQLite, para consultar e baixar de novo.
 - **API JSON** (`/api/execucoes/<id>`) para integrar com outros sistemas.
 - Leitura de **OFX** (o formato que os bancos exportam) e de **CSV**, em UTF-8 ou Latin-1.
+
+## Régua de cobrança
+
+Depois da conciliação, o que sobrou em aberto vira uma lista de quem contatar e como. Cada cliente recebe **uma única mensagem** com todos os seus títulos, no tom da etapa do título mais atrasado:
+
+| Etapa | Quando | Tom |
+| --- | --- | --- |
+| Lembrete | 3 dias antes do vencimento | leve |
+| Vence hoje | no dia | leve |
+| Cobrança amigável | 3 dias de atraso | amigável |
+| Cobrança firme | 10 dias de atraso | firme |
+| Último aviso | 30 dias de atraso | formal |
+
+A tela mostra os clientes do mais atrasado para o menos atrasado, com a mensagem pronta, um botão de copiar e um link para enviar pelo WhatsApp. As etapas e os textos ficam em `conciliacao/regua.py` e são fáceis de ajustar.
 
 ## Tecnologias
 
@@ -62,7 +77,7 @@ Para gerar de novo os dados fictícios: `python scripts/gerar_exemplos.py`.
 pytest
 ```
 
-19 testes cobrem a leitura de OFX e CSV, as regras do motor (exato, com juros, agrupado, não identificado, cliente diferente com o mesmo valor), o relatório em Excel e o fluxo completo pela aplicação.
+23 testes cobrem a leitura de OFX e CSV, as regras do motor (exato, com juros, agrupado, não identificado, cliente diferente com o mesmo valor), a régua de cobrança, o relatório em Excel e o fluxo completo pela aplicação.
 
 ## Estrutura
 
@@ -70,6 +85,7 @@ pytest
 app.py                      rotas da aplicação Flask
 conciliacao/leitura.py      leitura de OFX, CSV de extrato e CSV de títulos
 conciliacao/motor.py        motor de conciliação (pontuação e agrupamento)
+conciliacao/regua.py        régua de cobrança
 conciliacao/relatorio.py    relatório em Excel
 conciliacao/historico.py    histórico em SQLite
 scripts/gerar_exemplos.py   gera os dados fictícios
@@ -81,7 +97,7 @@ tests/                      testes automatizados
 
 - Buscar o extrato direto pela API do banco, em vez de importar o arquivo.
 - Tela para o financeiro confirmar ou corrigir um par sugerido, e o motor aprender com isso.
-- Ligar com uma régua de cobrança automática para os títulos em atraso.
+- Disparar as mensagens da régua automaticamente pela API do WhatsApp.
 
 ## Autor
 
