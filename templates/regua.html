@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Régua de cobrança · Concilia{% endblock %}
+{% block conteudo %}
+<section class="cabecalho">
+  <div>
+    <h1>Régua de cobrança</h1>
+    <p class="suave">Conciliação #{{ execucao.id }} · {{ acoes|length }} cliente(s) para contatar · referência {{ hoje|data_br }}</p>
+  </div>
+  <a class="botao secundario" href="{{ url_for('ver_execucao', execucao_id=execucao.id) }}">← Voltar à conciliação</a>
+</section>
+
+<section class="etapas">
+  {% for e in etapas %}<span class="selo {{ e.tom }}">{{ e.nome }}: {{ 'D' ~ ('%+d'|format(e.a_partir_de_dias) if e.a_partir_de_dias else '') }}</span>{% endfor %}
+</section>
+
+{% for a in acoes %}
+<article class="cartao acao">
+  <header>
+    <div>
+      <h2>{{ a.cliente }}</h2>
+      <p class="suave">Título(s) {{ a.titulos }} · {{ a.total|moeda }} ·
+        {% if a.dias > 0 %}{{ a.dias }} dia(s) de atraso{% elif a.dias == 0 %}vence hoje{% else %}vence em {{ -a.dias }} dia(s){% endif %}</p>
+    </div>
+    <span class="selo {{ a.tom }}">{{ a.etapa }}</span>
+  </header>
+  <pre class="mensagem">{{ a.mensagem }}</pre>
+  <button class="botao secundario copiar" data-texto="{{ a.mensagem }}">Copiar mensagem</button>
+  <a class="botao whats" href="{{ a.link_whatsapp }}" target="_blank" rel="noopener">Enviar no WhatsApp</a>
+</article>
+{% else %}
+<p>Nenhum cliente para cobrar nesta data. 🎉</p>
+{% endfor %}
+{% endblock %}

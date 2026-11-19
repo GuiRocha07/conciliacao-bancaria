@@ -6,7 +6,10 @@
     <h1>Conciliação #{{ execucao.id }}</h1>
     <p class="suave">{{ execucao.arquivo_extrato }} × {{ execucao.arquivo_titulos }} · {{ execucao.criada_em.replace('T', ' ') }}</p>
   </div>
-  <a class="botao" href="{{ url_for('baixar_excel', execucao_id=execucao.id) }}">⬇ Baixar Excel</a>
+  <div>
+    <a class="botao secundario" href="{{ url_for('ver_regua', execucao_id=execucao.id) }}">📣 Régua de cobrança</a>
+    <a class="botao" href="{{ url_for('baixar_excel', execucao_id=execucao.id) }}">⬇ Baixar Excel</a>
+  </div>
 </section>
 
 <section class="indicadores">
