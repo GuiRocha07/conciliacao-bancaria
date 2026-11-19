@@ -6,3 +6,12 @@ document.querySelectorAll(".abas button").forEach((botao) => {
     document.getElementById(botao.dataset.aba).classList.add("ativa");
   });
 });
+
+// Botão "Copiar mensagem" da régua de cobrança.
+document.querySelectorAll(".copiar").forEach((botao) => {
+  botao.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(botao.dataset.texto);
+    botao.textContent = "Copiado ✓";
+    setTimeout(() => (botao.textContent = "Copiar mensagem"), 2000);
+  });
+});

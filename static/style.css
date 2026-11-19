@@ -56,3 +56,13 @@ th { color: var(--suave); font-weight: 500; background: #f8fafc; }
 .selo.vermelho { background: #fee2e2; color: #991b1b; }
 .selo.cinza { background: #e2e8f0; color: #334155; }
 .selo.azul { background: #dbeafe; color: #1e40af; }
+.etapas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.selo.leve { background: #e0f2fe; color: #075985; }
+.selo.amigável { background: #fef9c3; color: #854d0e; }
+.selo.firme { background: #ffedd5; color: #9a3412; }
+.selo.formal { background: #fee2e2; color: #991b1b; }
+.acao { margin-bottom: 14px; }
+.acao header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.acao h2 { margin: 0; font-size: 1.1rem; }
+.mensagem { background: #f8fafc; border: 1px solid var(--borda); border-radius: 8px; padding: 10px; white-space: pre-wrap; font-family: inherit; }
+.botao.whats { background: #16a34a; }
