@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Histórico · Concilia{% endblock %}
+{% block conteudo %}
+<h1>Histórico de conciliações</h1>
+{% if execucoes %}
+<table>
+  <thead><tr><th>#</th><th>Data</th><th>Extrato</th><th>Títulos</th><th class="num">Conciliado</th><th class="num">Não identificado</th><th class="num">Em atraso</th></tr></thead>
+  <tbody>
+  {% for e in execucoes %}
+    <tr>
+      <td><a href="{{ url_for('ver_execucao', execucao_id=e.id) }}">{{ e.id }}</a></td>
+      <td>{{ e.criada_em.replace('T', ' ') }}</td><td>{{ e.arquivo_extrato }}</td><td>{{ e.arquivo_titulos }}</td>
+      <td class="num">{{ e.resumo.percentual_conciliado }}%</td>
+      <td class="num">{{ e.resumo.valor_nao_identificado|moeda }}</td>
+      <td class="num">{{ e.resumo.valor_em_atraso|moeda }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Nenhuma conciliação feita ainda. <a href="{{ url_for('inicio') }}">Fazer a primeira</a>.</p>
+{% endif %}
+{% endblock %}

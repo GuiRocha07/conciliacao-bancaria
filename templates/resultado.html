@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block titulo %}Conciliação #{{ execucao.id }} · Concilia{% endblock %}
+{% block conteudo %}
+<section class="cabecalho">
+  <div>
+    <h1>Conciliação #{{ execucao.id }}</h1>
+    <p class="suave">{{ execucao.arquivo_extrato }} × {{ execucao.arquivo_titulos }} · {{ execucao.criada_em.replace('T', ' ') }}</p>
+  </div>
+  <a class="botao" href="{{ url_for('baixar_excel', execucao_id=execucao.id) }}">⬇ Baixar Excel</a>
+</section>
+
+<section class="indicadores">
+  <div class="indicador verde"><span>Valor conciliado</span><b>{{ r.valor_conciliado|moeda }}</b><small>{{ r.percentual_conciliado }}% do recebido</small></div>
+  <div class="indicador"><span>Créditos no extrato</span><b>{{ r.creditos }}</b><small>{{ r.total_creditos|moeda }}</small></div>
+  <div class="indicador amarelo"><span>Diferença de valor</span><b>{{ r.divergentes }}</b><small>pagos com juros ou desconto</small></div>
+  <div class="indicador cinza"><span>Não identificados</span><b>{{ r.nao_identificados }}</b><small>{{ r.valor_nao_identificado|moeda }}</small></div>
+  <div class="indicador vermelho"><span>Em atraso</span><b>{{ r.titulos_em_atraso }}</b><small>{{ r.valor_em_atraso|moeda }}</small></div>
+</section>
+
+<div class="barra"><div style="width: {{ r.percentual_conciliado }}%"></div></div>
+
+<nav class="abas">
+  <button data-aba="aba-exatos" class="ativa">Conciliados ({{ exatos|length }})</button>
+  <button data-aba="aba-divergentes">Com diferença ({{ divergentes|length }})</button>
+  <button data-aba="aba-nao">Não identificados ({{ nao_identificados|length }})</button>
+  <button data-aba="aba-aberto">Títulos em aberto ({{ em_aberto|length }})</button>
+</nav>
+
+<section id="aba-exatos" class="aba ativa">
+  <table>
+    <thead><tr><th>Pago em</th><th>Descrição no extrato</th><th>Título(s)</th><th>Cliente</th><th class="num">Valor</th><th>Confiança</th><th>Por que casou</th></tr></thead>
+    <tbody>
+    {% for c in exatos %}
+      <tr>
+        <td>{{ c.data_pagamento|data_br }}</td><td>{{ c.descricao }}</td>
+        <td>{{ c.titulos }}{% if c.status == 'agrupado' %} <span class="selo azul">vários</span>{% endif %}</td>
+        <td>{{ c.cliente }}</td><td class="num">{{ c.valor_pago|moeda }}</td>
+        <td><span class="selo {{ 'verde' if c.confianca == 'alta' else 'amarelo' }}">{{ c.confianca }}</span></td>
+        <td class="suave">{{ c.motivos }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section id="aba-divergentes" class="aba">
+  <table>
+    <thead><tr><th>Pago em</th><th>Título</th><th>Cliente</th><th>Vencimento</th><th class="num">Valor do título</th><th class="num">Valor pago</th><th class="num">Diferença</th><th>Atraso</th></tr></thead>
+    <tbody>
+    {% for c in divergentes %}
+      <tr>
+        <td>{{ c.data_pagamento|data_br }}</td><td>{{ c.titulos }}</td><td>{{ c.cliente }}</td><td>{{ c.vencimento|data_br }}</td>
+        <td class="num">{{ c.valor_titulos|moeda }}</td><td class="num">{{ c.valor_pago|moeda }}</td>
+        <td class="num {{ 'positivo' if c.diferenca > 0 else 'negativo' }}">{{ c.diferenca|moeda }}</td>
+        <td>{{ c.dias_atraso }} dia(s)</td>
+      </tr>
+    {% else %}<tr><td colspan="8">Nenhuma diferença de valor.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section id="aba-nao" class="aba">
+  <p class="suave">Créditos que não bateram com nenhum título: confira com o comercial antes de dar baixa.</p>
+  <table>
+    <thead><tr><th>Data</th><th>Descrição no extrato</th><th>Documento</th><th class="num">Valor</th></tr></thead>
+    <tbody>
+    {% for c in nao_identificados %}
+      <tr><td>{{ c.data|data_br }}</td><td>{{ c.descricao }}</td><td>{{ c.documento }}</td><td class="num">{{ c.valor|moeda }}</td></tr>
+    {% else %}<tr><td colspan="4">Todos os créditos foram identificados. 🎉</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section id="aba-aberto" class="aba">
+  <table>
+    <thead><tr><th>Título</th><th>Cliente</th><th>Vencimento</th><th class="num">Valor</th><th>Situação</th></tr></thead>
+    <tbody>
+    {% for t in em_aberto %}
+      <tr>
+        <td>{{ t.titulo }}</td><td>{{ t.cliente }}</td><td>{{ t.vencimento|data_br }}</td><td class="num">{{ t.valor|moeda }}</td>
+        <td>{% if t.situacao == 'em atraso' %}<span class="selo vermelho">{{ t.dias_atraso }} dia(s) de atraso</span>
+            {% else %}<span class="selo cinza">a vencer</span>{% endif %}</td>
+      </tr>
+    {% else %}<tr><td colspan="5">Nenhum título em aberto.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

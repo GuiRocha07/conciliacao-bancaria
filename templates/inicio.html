@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<section class="destaque">
+  <h1>Conciliação bancária em segundos</h1>
+  <p>Envie o extrato do banco e a lista de contas a receber. O Concilia descobre quem pagou o quê,
+     aponta diferenças de valor, créditos sem dono e títulos em atraso.</p>
+</section>
+
+<section class="colunas">
+  <form class="cartao" method="post" action="{{ url_for('executar') }}" enctype="multipart/form-data">
+    <h2>Seus arquivos</h2>
+    <label>Extrato bancário <small>(OFX ou CSV)</small>
+      <input type="file" name="extrato" accept=".ofx,.csv,.txt">
+    </label>
+    <label>Contas a receber <small>(CSV: titulo, cliente, cnpj, emissao, vencimento, valor)</small>
+      <input type="file" name="titulos" accept=".csv,.txt">
+    </label>
+    <label>Data de referência <small>(para calcular atrasos)</small>
+      <input type="date" name="data_referencia" value="{{ hoje }}">
+    </label>
+    <button class="botao">Conciliar</button>
+  </form>
+
+  <form class="cartao exemplo" method="post" action="{{ url_for('executar') }}">
+    <h2>Só quer ver funcionando?</h2>
+    <p>Use um extrato e uma carteira de títulos fictícios, com pagamentos exatos, pagamentos com juros,
+       um PIX que quita três títulos e créditos sem identificação.</p>
+    <input type="hidden" name="exemplos" value="1">
+    <button class="botao secundario">Usar dados de exemplo</button>
+  </form>
+</section>
+{% endblock %}
