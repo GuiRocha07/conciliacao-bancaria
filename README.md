@@ -1,5 +1,7 @@
 # 🏦 Concilia: conciliação bancária automática
 
+[![Testes](https://github.com/GuiRocha07/conciliacao-bancaria/actions/workflows/tests.yml/badge.svg)](https://github.com/GuiRocha07/conciliacao-bancaria/actions/workflows/tests.yml)
+
 Aplicação web em Python que cruza o **extrato do banco** com as **contas a receber** e descobre sozinha quem pagou o quê: pagamentos exatos, pagamentos com juros ou desconto, um PIX que quita vários títulos, créditos sem dono e títulos em atraso. O resultado sai num painel e num **relatório em Excel** pronto para o financeiro.
 
 > Projeto de portfólio inspirado em processos financeiros reais de uma distribuidora onde trabalho com automação. O código foi escrito do zero, e todos os clientes, CNPJs e valores são fictícios.
